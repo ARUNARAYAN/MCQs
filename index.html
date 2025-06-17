@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Belladonna M40 - MCQ Loader</title>
+</head>
+<body>
+  <h1>Belladonna M40 - MCQ Viewer</h1>
+  <pre id="output">Loading...</pre>
+
+  <script>
+    const rawCSVUrl =
+      "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/questions.csv";
+
+    const proxiedURL = `https://corsproxy.io/?${encodeURIComponent(rawCSVUrl)}`;
+
+    fetch(proxiedURL)
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response not ok");
+        return res.text();
+      })
+      .then((csvText) => {
+        const lines = csvText.trim().split("\n");
+        const questions = lines.map((line, index) => {
+          const [q, a, b, c, d, answer] = line.split(",");
+          return {
+            id: index + 1,
+            question: q,
+            options: [a, b, c, d],
+            answer: answer?.trim()
+          };
+        });
+
+        document.getElementById("output").textContent =
+          JSON.stringify(questions, null, 2);
+      })
+      .catch((err) => {
+        document.getElementById("output").textContent =
+          "Error loading questions: " + err.message;
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
